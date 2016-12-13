@@ -13,7 +13,6 @@ namespace ConsoleApplication1
         {
             Bot foxBot = new Bot("FoxBot");
             foxBot.Connect();
-            
         }
     }
 }
