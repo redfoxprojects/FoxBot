@@ -26,8 +26,8 @@ namespace FoxBot
         private bool isQuitting = false;
         private SqlCommand sqlCom;
         private const string CHANNEL_PREFIX = "#";
-        protected const string REALNAME = "";
-        protected const string USERNAME = "";
+        protected const string REALNAME = "foxbot";
+        protected const string USERNAME = "foxbot";
         private string channel = null;
 
         public delegate void DataReceivedEventHandler(object sender, EventArgs e);
@@ -76,8 +76,8 @@ namespace FoxBot
             this.client.ClientInfoReceived += client_ClientInfoReceived;
             this.client.ValidateSslCertificate += client_ValidateSslCertificate;
             IrcUserRegistrationInfo serviceReg = new IrcUserRegistrationInfo();
-            serviceReg.RealName = "foxbot";
-            serviceReg.UserName = "foxbot";
+            serviceReg.RealName = REALNAME;
+            serviceReg.UserName = USERNAME;
             serviceReg.NickName = this.Nick;
             serviceReg.Password = "";
             this.client.Connect("irc.choopa.net", 6667, false, serviceReg);
