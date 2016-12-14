@@ -25,15 +25,18 @@ namespace FoxBot
         private IrcDotNet.IrcClient client = new IrcClient();
         private bool isQuitting = false;
         private SqlCommand sqlCom;
-        private const string CHANNEL = "#channel";
-        private const string NICK = "foxbot";
+        private const string CHANNEL_PREFIX = "#";
+        protected const string REALNAME = "";
+        protected const string USERNAME = "";
+        private string channel = null;
 
         public delegate void DataReceivedEventHandler(object sender, EventArgs e);
         public event DataReceivedEventHandler DataReceived;
 
-        public Bot(string nick)
+        public Bot(string nick, string channel)
         {
             this.Nick = nick;
+            this.Channel = channel;
             sqlCom = new SqlCommand(string.Empty, new SqlConnection(ConfigurationManager.ConnectionStrings["foxbot"].ConnectionString));
         }
 
@@ -41,6 +44,21 @@ namespace FoxBot
         {
             get;
             set;
+        }
+
+        public string Channel
+        {
+            get
+            {
+                return channel;
+            }
+            set
+            {
+                if (value.StartsWith(CHANNEL_PREFIX))
+                    channel = CHANNEL_PREFIX + value;
+                else
+                    channel = value;
+            }
         }
 
         public void Connect()
@@ -60,7 +78,7 @@ namespace FoxBot
             IrcUserRegistrationInfo serviceReg = new IrcUserRegistrationInfo();
             serviceReg.RealName = "foxbot";
             serviceReg.UserName = "foxbot";
-            serviceReg.NickName = NICK;
+            serviceReg.NickName = this.Nick;
             serviceReg.Password = "";
             this.client.Connect("irc.choopa.net", 6667, false, serviceReg);
             while(!isQuitting)
@@ -104,7 +122,7 @@ namespace FoxBot
 
         void client_MotdReceived(object sender, EventArgs e)
         {
-            this.client.SendRawMessage("JOIN :" + CHANNEL);//JOIN :#channel //PRIVMSG #channel :
+            this.client.SendRawMessage("JOIN :" + this.Channel);//JOIN :#channel //PRIVMSG #channel :
         }
 
         void client_ConnectFailed(object sender, IrcErrorEventArgs e)
@@ -143,13 +161,12 @@ namespace FoxBot
         {
             Regex reg = new Regex(@"[\w]+");
             int outvar = 0;
-            if (message.ToLower().StartsWith(NICK))
+            if (message.ToLower().StartsWith(this.Nick))
                 foreach(Match m in reg.Matches(message))
                     switch(m.Value.ToLower())
                     {
                         case "speak":
                             this.client.LocalUser.SendMessage(this.client.Channels[0], "I AM FOXBOT! :V");
-                            return;
                             break;
                         case "weather":
                             Match zip = m.NextMatch();
@@ -160,7 +177,6 @@ namespace FoxBot
                                 Thread t = new Thread(pts);
                                 t.Start(w);
                             }   
-                            return;
                             break;
                     }
         }

@@ -21,7 +21,7 @@ namespace FoxBoxService
 
         protected override void OnStart(string[] args)
         {
-            Bot bot = new Bot("FoxBot");
+            Bot bot = new Bot("FoxBot", "#channel");
             bot.Connect();
         }
 

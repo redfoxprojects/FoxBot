@@ -18,5 +18,10 @@ namespace FoxBoxService
             this.serviceInstaller1.StartType = System.ServiceProcess.ServiceStartMode.Manual;
             this.serviceProcessInstaller1.Account = System.ServiceProcess.ServiceAccount.LocalSystem;
         }
+
+        private void serviceProcessInstaller1_AfterInstall(object sender, InstallEventArgs e)
+        {
+
+        }
     }
 }
