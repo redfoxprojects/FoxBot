@@ -55,9 +55,9 @@ namespace FoxBot
             set
             {
                 if (value.StartsWith(CHANNEL_PREFIX))
-                    channel = CHANNEL_PREFIX + value;
-                else
                     channel = value;
+                else
+                    channel = CHANNEL_PREFIX + value;
             }
         }
 
@@ -80,7 +80,7 @@ namespace FoxBot
             serviceReg.UserName = USERNAME;
             serviceReg.NickName = this.Nick;
             serviceReg.Password = "";
-            this.client.Connect("irc.choopa.net", 6667, false, serviceReg);
+            this.client.Connect("irc.anthrochat.net", 6667, false, serviceReg);
             while(!isQuitting)
                 Thread.Sleep(10000);
         }
@@ -161,7 +161,7 @@ namespace FoxBot
         {
             Regex reg = new Regex(@"[\w]+");
             int outvar = 0;
-            if (message.ToLower().StartsWith(this.Nick))
+            if (message.ToLower().StartsWith(this.Nick.ToLower()))
                 foreach(Match m in reg.Matches(message))
                     switch(m.Value.ToLower())
                     {
@@ -191,7 +191,7 @@ namespace FoxBot
             }
             catch (Exception e)
             {
-
+                System.Console.Out.WriteLine(e);
             }
             finally
             {

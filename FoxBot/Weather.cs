@@ -17,11 +17,14 @@ namespace FoxBot
         private string currentLocation;
         private WebRequest request;
         private ImmediateWeather immediateWeather;
+        private const string URL_START = "https://api.worldweatheronline.com/premium/v1/weather.ashx";
+        private const string URL_KEY = "4da950e3fee1447fb5e235030172207";
+        private const string URL = URL_START + "?q={0}&key=" + URL_KEY + "&num_of_days=1";
 
         public Weather(string location)
         {
             currentLocation = location;
-            request = WebRequest.Create(string.Format("http://api.worldweatheronline.com/free/v1/weather.ashx?q={0}&key=5ay9y7urmtdcm2v82p34qbzg&num_of_days=1", currentLocation));
+            request = WebRequest.Create(string.Format(URL, currentLocation));
             immediateWeather = new ImmediateWeather();
         }
 

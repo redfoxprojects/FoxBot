@@ -16,7 +16,9 @@ namespace FoxBoxService
             InitializeComponent();
             this.serviceInstaller1.ServiceName = "Service1";
             this.serviceInstaller1.StartType = System.ServiceProcess.ServiceStartMode.Manual;
-            this.serviceProcessInstaller1.Account = System.ServiceProcess.ServiceAccount.LocalSystem;
+            this.serviceProcessInstaller1.Account = System.ServiceProcess.ServiceAccount.NetworkService;
+            
+            this.serviceInstaller1.DisplayName = "Foxbot";
         }
 
         private void serviceProcessInstaller1_AfterInstall(object sender, InstallEventArgs e)
