@@ -138,7 +138,7 @@ namespace FoxBot
                 try
                 {
                     sqlCom.Connection.Open();
-                    sqlCom.CommandText = "insert into rawmessage (message) values ('" + e.RawContent.Replace("'", "''") + "')";
+                    sqlCom.CommandText = "insert into rawmessage (message) values ('" + e.RawContent.Replace("'", "''") + "')"; //this should be parameterized and encapsulated, however it is inline out of respect for speed of the system in execution flow.
                     sqlCom.ExecuteNonQuery();
                 }
                 catch (Exception ex) { Console.Out.WriteLine(ex.Message); }
