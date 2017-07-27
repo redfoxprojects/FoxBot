@@ -12,5 +12,8 @@ namespace FoxBot
         public decimal windSpeed;
         public string windDir;
         public string clouds;
+        public string city;
+        public string state;
+        public string country;
     }
 }

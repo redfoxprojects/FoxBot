@@ -143,7 +143,10 @@ namespace FoxBot
                 }
                 catch (Exception ex) { Console.Out.WriteLine(ex.Message); }
                 finally { sqlCom.Connection.Close(); }
-                Listen(e.Message.Parameters[1]);
+                if (this.client.Channels.Count == 0)
+                    return;
+                else
+                    Listen(e.Message);
             }
         }
 
@@ -157,28 +160,48 @@ namespace FoxBot
             this.client.LocalUser.SendMessage(this.client.Channels[0], message);
         }
 
-        public void Listen(string message)
+        public void Listen(IrcClient.IrcMessage ircMessage)
         {
-            Regex reg = new Regex(@"[\w]+");
-            int outvar = 0;
+            string message = ircMessage.Parameters[1];
             if (message.ToLower().StartsWith(this.Nick.ToLower()))
-                foreach(Match m in reg.Matches(message))
-                    switch(m.Value.ToLower())
+            {
+                string receivedMessageNick = ircMessage.Parameters[0];
+                Regex reg = new Regex(@"[\w]+");
+                int outvar = 0;
+                foreach (Match m in reg.Matches(message))
+                    switch (m.Value.ToLower())
                     {
                         case "speak":
                             this.client.LocalUser.SendMessage(this.client.Channels[0], "I AM FOXBOT! :V");
-                            break;
+                            return;
+                        case "bitch":
+                            this.client.LocalUser.SendMessage(this.client.Channels[0], "BITCH! :V");
+                            return;
                         case "weather":
                             Match zip = m.NextMatch();
-                            if (zip != null &&  zip.Length == 5 && int.TryParse(zip.Value, out outvar))
-                            {
-                                Weather w = new Weather(outvar.ToString());
-                                ParameterizedThreadStart pts = new ParameterizedThreadStart(ProcessRequest);
-                                Thread t = new Thread(pts);
-                                t.Start(w);
-                            }   
-                            break;
+                            if (zip != null)
+                                if(zip.Length == 5 && int.TryParse(zip.Value, out outvar))
+                                {
+                                    Weather w = new Weather(outvar.ToString());
+                                    ParameterizedThreadStart pts = new ParameterizedThreadStart(ProcessRequest);
+                                    Thread t = new Thread(pts);
+                                    t.Start(w);
+                                }
+                                else if (zip.Length == 3)
+                                {
+                                    Weather w = new Weather(zip.ToString());
+                                    ParameterizedThreadStart pts = new ParameterizedThreadStart(ProcessRequest);
+                                    Thread t = new Thread(pts);
+                                    t.Start(w);
+                                }
+                            return;
                     }
+                string blah = ircMessage.Source.Name;
+                string[] msg = message.Split(new char[] { ' ' });
+                if(msg.Length > 1 && !blah.StartsWith(CHANNEL_PREFIX)) //only process messages from channel users
+                    this.client.LocalUser.SendMessage(this.client.Channels[0], blah + ": " + string.Join(" ", msg, 1, (msg.Length-1)) + " :v");
+                return;
+            }
         }
 
         protected void ProcessRequest(object o)
@@ -187,7 +210,13 @@ namespace FoxBot
             {
                 Weather w = (Weather)o;
                 w.GetWeather();
-                SendMessage(string.Format("{0}°F wind {1} @ {2} MPH with {3} skies", new string[] { w.ImmediateWeather.temp.ToString(), w.ImmediateWeather.windDir.Trim(), w.ImmediateWeather.windSpeed.ToString(), w.ImmediateWeather.clouds.Trim() }));
+                SendMessage(string.Format("{0}°F wind {1} @ {2} MPH with {3} skies in {4}, {5}, {6}", new string[] { w.ImmediateWeather.temp.ToString(),
+                                                                                                                w.ImmediateWeather.windDir.Trim(),
+                                                                                                                w.ImmediateWeather.windSpeed.ToString(),
+                                                                                                                w.ImmediateWeather.clouds.Trim(),
+                                                                                                                w.ImmediateWeather.city.Trim(),
+                                                                                                                w.ImmediateWeather.state.Trim(),
+                                                                                                                w.ImmediateWeather.country.Trim()}));
             }
             catch (Exception e)
             {

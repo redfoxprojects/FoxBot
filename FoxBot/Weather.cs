@@ -19,7 +19,7 @@ namespace FoxBot
         private ImmediateWeather immediateWeather;
         private const string URL_START = "https://api.worldweatheronline.com/premium/v1/weather.ashx";
         private const string URL_KEY = "4da950e3fee1447fb5e235030172207";
-        private const string URL = URL_START + "?q={0}&key=" + URL_KEY + "&num_of_days=1";
+        private const string URL = URL_START + "?q={0}&key=" + URL_KEY + "&num_of_days=1&includelocation=yes";
 
         public Weather(string location)
         {
@@ -30,13 +30,20 @@ namespace FoxBot
 
         public ImmediateWeather GetWeather()
         {
-            int blah;
-            if (!int.TryParse(currentLocation, out blah) && !currentLocation.Length.Equals(5))
+            
+            if (currentLocation.Length.Equals(5))
             {
-                throw new Exception("zip not long enough");
+                int blah;
+                int.TryParse(currentLocation, out blah);
+                SetWeather(request.GetResponse());
             }
-            object o = new object();
-            SetWeather(request.GetResponse());
+            else if (currentLocation.Length.Equals(3))
+            {
+                SetWeather(request.GetResponse());
+            }
+            else
+                throw new Exception("zip not long enough");
+            
             return immediateWeather;
 
         }
@@ -73,6 +80,24 @@ namespace FoxBot
                         case "weatherdesc":
                             xmlReader.Read();
                             immediateWeather.clouds = xmlReader.Value;
+                            break;
+                    }
+                if (xmlReader.NodeType.Equals(XmlNodeType.EndElement) && xmlReader.Name.Equals("nearest_area"))
+                    Console.Out.WriteLine("bad request");
+                else if (xmlReader.NodeType.Equals(XmlNodeType.Element))
+                    switch (xmlReader.Name.ToLower())
+                    {
+                        case "areaname":
+                            xmlReader.Read();
+                            immediateWeather.city = xmlReader.Value;
+                            break;
+                        case "region":
+                            xmlReader.Read();
+                            immediateWeather.state = xmlReader.Value;
+                            break;
+                        case "country":
+                            xmlReader.Read();
+                            immediateWeather.country = xmlReader.Value;
                             break;
                     }
             }
