@@ -168,6 +168,7 @@ namespace FoxBot
                 string receivedMessageNick = ircMessage.Parameters[0];
                 Regex reg = new Regex(@"[\w]+");
                 int outvar = 0;
+                string zipCode = string.Empty;
                 foreach (Match m in reg.Matches(message))
                     switch (m.Value.ToLower())
                     {
@@ -181,19 +182,13 @@ namespace FoxBot
                             Match zip = m.NextMatch();
                             if (zip != null)
                                 if(zip.Length == 5 && int.TryParse(zip.Value, out outvar))
-                                {
-                                    Weather w = new Weather(outvar.ToString());
-                                    ParameterizedThreadStart pts = new ParameterizedThreadStart(ProcessRequest);
-                                    Thread t = new Thread(pts);
-                                    t.Start(w);
-                                }
+                                    zipCode = outvar.ToString();
                                 else if (zip.Length == 3)
-                                {
-                                    Weather w = new Weather(zip.ToString());
-                                    ParameterizedThreadStart pts = new ParameterizedThreadStart(ProcessRequest);
-                                    Thread t = new Thread(pts);
-                                    t.Start(w);
-                                }
+                                    zipCode = zip.ToString();
+                            Weather w = new Weather(zipCode);
+                            ParameterizedThreadStart pts = new ParameterizedThreadStart(ProcessRequest);
+                            Thread t = new Thread(pts);
+                            t.Start(w);
                             return;
                     }
                 string blah = ircMessage.Source.Name;
