@@ -11,7 +11,7 @@ namespace ConsoleApplication1
     {
         static void Main(string[] args)
         {
-            Bot foxBot = new Bot("FoxBot", "realfreedom");
+            Bot foxBot = new Bot("FoxBot", "gayfurs", "irc.furnet.org");
             foxBot.Connect();
         }
     }

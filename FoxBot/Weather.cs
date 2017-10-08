@@ -17,9 +17,9 @@ namespace FoxBot
         private string currentLocation;
         private WebRequest request;
         private ImmediateWeather immediateWeather;
-        private const string URL_START = "https://api.worldweatheronline.com/premium/v1/weather.ashx";
-        private const string URL_KEY = "4da950e3fee1447fb5e235030172207";
-        private const string URL = URL_START + "?q={0}&key=" + URL_KEY + "&num_of_days=1&includelocation=yes";
+        private const string URL_START = "https://api.apixu.com/v1/current.xml";
+        private const string URL_KEY = "ff436f1b91a7474aab4223122170710";
+        private const string URL = URL_START + "?q={0}&key=" + URL_KEY; //+ "&num_of_days=1&includelocation=yes";
 
         public Weather(string location)
         {
@@ -60,46 +60,54 @@ namespace FoxBot
             XmlReader xmlReader = XmlReader.Create(s);
             while (xmlReader.Read())
             {
-                if (xmlReader.NodeType.Equals(XmlNodeType.EndElement) && xmlReader.Name.Equals("current_condition"))
-                    Console.Out.WriteLine("bad request");
-                else if (xmlReader.NodeType.Equals(XmlNodeType.Element))
-                    switch (xmlReader.Name.ToLower())
-                    {
-                        case "temp_f":
-                            xmlReader.Read();
-                            immediateWeather.temp = decimal.Parse(xmlReader.Value);
-                            break;
-                        case "windspeedmiles":
-                            xmlReader.Read();
-                            immediateWeather.windSpeed = decimal.Parse(xmlReader.Value);
-                            break;
-                        case "winddir16point":
-                            xmlReader.Read();
-                            immediateWeather.windDir = xmlReader.Value;
-                            break;
-                        case "weatherdesc":
-                            xmlReader.Read();
-                            immediateWeather.clouds = xmlReader.Value;
-                            break;
-                    }
-                if (xmlReader.NodeType.Equals(XmlNodeType.EndElement) && xmlReader.Name.Equals("nearest_area"))
-                    Console.Out.WriteLine("bad request");
-                else if (xmlReader.NodeType.Equals(XmlNodeType.Element))
-                    switch (xmlReader.Name.ToLower())
-                    {
-                        case "areaname":
-                            xmlReader.Read();
-                            immediateWeather.city = xmlReader.Value;
-                            break;
-                        case "region":
-                            xmlReader.Read();
-                            immediateWeather.state = xmlReader.Value;
-                            break;
-                        case "country":
-                            xmlReader.Read();
-                            immediateWeather.country = xmlReader.Value;
-                            break;
-                    }
+                if (xmlReader.Name.Equals("current") && xmlReader.NodeType.Equals(XmlNodeType.Element) && !xmlReader.NodeType.Equals(XmlNodeType.EndElement))
+                    while (xmlReader.Read() && !(xmlReader.NodeType.Equals(XmlNodeType.EndElement) && xmlReader.Name.Equals("current")))
+                        if (xmlReader.NodeType.Equals(XmlNodeType.EndElement))
+                            continue;
+                        else
+                            switch (xmlReader.Name.ToLower())
+                            {
+                                case "temp_f":
+                                    xmlReader.Read();
+                                    immediateWeather.temp = decimal.Parse(xmlReader.Value);
+                                    break;
+                                case "wind_mph":
+                                    xmlReader.Read();
+                                    immediateWeather.windSpeed = decimal.Parse(xmlReader.Value);
+                                    break;
+                                case "wind_dir":
+                                    xmlReader.Read();
+                                    immediateWeather.windDir = xmlReader.Value;
+                                    break;
+                                case "condition":
+                                    while (xmlReader.Read() && !(xmlReader.NodeType.Equals(XmlNodeType.EndElement) && xmlReader.Name.Equals("condition")))
+                                        if (xmlReader.Name.Equals("text") && xmlReader.NodeType.Equals(XmlNodeType.Element))
+                                        {
+                                            xmlReader.Read();
+                                            immediateWeather.clouds = xmlReader.Value;
+                                        }
+                                    break;
+                            }
+                if (xmlReader.Name.Equals("location") && xmlReader.NodeType.Equals(XmlNodeType.Element) && !xmlReader.NodeType.Equals(XmlNodeType.EndElement))
+                    while (xmlReader.Read() && !(xmlReader.NodeType.Equals(XmlNodeType.EndElement) && xmlReader.Name.Equals("location")))
+                        if (xmlReader.NodeType.Equals(XmlNodeType.EndElement))
+                            continue;
+                        else
+                            switch (xmlReader.Name.ToLower())
+                            {
+                                case "name":
+                                    xmlReader.Read();
+                                    immediateWeather.city = xmlReader.Value;
+                                    break;
+                                case "region":
+                                    xmlReader.Read();
+                                    immediateWeather.state = xmlReader.Value;
+                                    break;
+                                case "country":
+                                    xmlReader.Read();
+                                    immediateWeather.country = xmlReader.Value;
+                                    break;
+                            }
             }
         }
     }

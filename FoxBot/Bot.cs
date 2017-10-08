@@ -29,14 +29,16 @@ namespace FoxBot
         protected const string REALNAME = "foxbot";
         protected const string USERNAME = "foxbot";
         private string channel = null;
+        private string server = string.Empty;
 
         public delegate void DataReceivedEventHandler(object sender, EventArgs e);
         public event DataReceivedEventHandler DataReceived;
 
-        public Bot(string nick, string channel)
+        public Bot(string nick, string channel, string server)
         {
             this.Nick = nick;
             this.Channel = channel;
+            this.server = server;
             sqlCom = new SqlCommand(string.Empty, new SqlConnection(ConfigurationManager.ConnectionStrings["foxbot"].ConnectionString));
         }
 
@@ -80,9 +82,15 @@ namespace FoxBot
             serviceReg.UserName = USERNAME;
             serviceReg.NickName = this.Nick;
             serviceReg.Password = "";
-            this.client.Connect("irc.anthrochat.net", 6667, false, serviceReg);
+            this.client.Connect(this.server, 6667, false, serviceReg);
+
             while(!isQuitting)
                 Thread.Sleep(10000);
+        }
+
+        private void LocalUser_JoinedChannel(object sender, IrcChannelEventArgs e)
+        {
+            this.client.LocalUser.SendMessage(this.client.Channels[0], "I AM FOXBOT! :V");
         }
 
         void client_ValidateSslCertificate(object sender, IrcValidateSslCertificateEventArgs e)
@@ -92,6 +100,7 @@ namespace FoxBot
 
         void client_ClientInfoReceived(object sender, EventArgs e)
         {
+            this.client.LocalUser.JoinedChannel += LocalUser_JoinedChannel;
             System.Console.Out.WriteLine(e.ToString());
         }
 
@@ -174,10 +183,10 @@ namespace FoxBot
                     {
                         case "speak":
                             this.client.LocalUser.SendMessage(this.client.Channels[0], "I AM FOXBOT! :V");
-                            return;
+                            break;
                         case "bitch":
                             this.client.LocalUser.SendMessage(this.client.Channels[0], "BITCH! :V");
-                            return;
+                            break;
                         case "weather":
                             Match zip = m.NextMatch();
                             if (zip != null)
@@ -189,12 +198,16 @@ namespace FoxBot
                             ParameterizedThreadStart pts = new ParameterizedThreadStart(ProcessRequest);
                             Thread t = new Thread(pts);
                             t.Start(w);
-                            return;
+                            break;
+                        case "leave":
+                            if (ircMessage.Source.Name.ToLower().Equals("alex"))
+                                client.Quit("D:");
+                            break;
                     }
-                string blah = ircMessage.Source.Name;
-                string[] msg = message.Split(new char[] { ' ' });
-                if(msg.Length > 1 && !blah.StartsWith(CHANNEL_PREFIX)) //only process messages from channel users
-                    this.client.LocalUser.SendMessage(this.client.Channels[0], blah + ": " + string.Join(" ", msg, 1, (msg.Length-1)) + " :v");
+                //string blah = ircMessage.Source.Name;
+                //string[] msg = message.Split(new char[] { ' ' });
+                //if(msg.Length > 1 && !blah.StartsWith(CHANNEL_PREFIX)) //only process messages from channel users
+                //    this.client.LocalUser.SendMessage(this.client.Channels[0], blah + ": " + string.Join(" ", msg, 1, (msg.Length-1)) + " :v");
                 return;
             }
         }
