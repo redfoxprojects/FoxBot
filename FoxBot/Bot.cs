@@ -141,22 +141,33 @@ namespace FoxBot
 
         void client_RawMessageReceived(object sender, IrcRawMessageEventArgs e)
         {
-            System.Console.Out.WriteLine(e.RawContent);
             if(!string.IsNullOrWhiteSpace(e.Message.Parameters[1]))
             {
-                try
-                {
-                    sqlCom.Connection.Open();
-                    sqlCom.CommandText = "insert into rawmessage (message) values ('" + e.RawContent.Replace("'", "''") + "')"; //this should be parameterized and encapsulated, however it is inline out of respect for speed of the system in execution flow.
-                    sqlCom.ExecuteNonQuery();
-                }
-                catch (Exception ex) { Console.Out.WriteLine(ex.Message); }
-                finally { sqlCom.Connection.Close(); }
                 if (this.client.Channels.Count == 0)
                     return;
                 else
                     Listen(e.Message);
             }
+            LogMessage(e.RawContent);
+        }
+
+        private void LogMessage(string s)
+        {
+            try
+                {
+                    sqlCom.CommandType = CommandType.StoredProcedure;
+                    sqlCom.CommandText = "AddRawMessage";
+                    sqlCom.Parameters.Clear();
+                    sqlCom.Parameters.Add(new SqlParameter("@message", s));
+                    sqlCom.Connection.Open();
+                    sqlCom.ExecuteNonQuery();
+                }
+                catch (Exception ex) { Console.Out.WriteLine(ex.Message); }
+                finally 
+                { 
+                    sqlCom.Connection.Close();
+                    System.Console.Out.WriteLine(s);
+                }
         }
 
         void client_Connected(object sender, EventArgs e)
@@ -181,9 +192,6 @@ namespace FoxBot
                 foreach (Match m in reg.Matches(message))
                     switch (m.Value.ToLower())
                     {
-                        case "speak":
-                            this.client.LocalUser.SendMessage(this.client.Channels[0], "I AM FOXBOT! :V");
-                            break;
                         case "bitch":
                             this.client.LocalUser.SendMessage(this.client.Channels[0], "BITCH! :V");
                             break;
@@ -204,10 +212,6 @@ namespace FoxBot
                                 client.Quit("D:");
                             break;
                     }
-                //string blah = ircMessage.Source.Name;
-                //string[] msg = message.Split(new char[] { ' ' });
-                //if(msg.Length > 1 && !blah.StartsWith(CHANNEL_PREFIX)) //only process messages from channel users
-                //    this.client.LocalUser.SendMessage(this.client.Channels[0], blah + ": " + string.Join(" ", msg, 1, (msg.Length-1)) + " :v");
                 return;
             }
         }
