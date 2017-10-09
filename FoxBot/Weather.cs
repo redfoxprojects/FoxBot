@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Threading;
 using System.Xml;
+using System.Xml.XPath;
 using System.ComponentModel;
 using System.Windows;
 using System.Net;
@@ -56,59 +57,23 @@ namespace FoxBot
 
         private void SetWeather(WebResponse response)
         {
-            Stream s = response.GetResponseStream();
-            XmlReader xmlReader = XmlReader.Create(s);
-            while (xmlReader.Read())
-            {
-                if (xmlReader.Name.Equals("current") && xmlReader.NodeType.Equals(XmlNodeType.Element) && !xmlReader.NodeType.Equals(XmlNodeType.EndElement))
-                    while (xmlReader.Read() && !(xmlReader.NodeType.Equals(XmlNodeType.EndElement) && xmlReader.Name.Equals("current")))
-                        if (xmlReader.NodeType.Equals(XmlNodeType.EndElement))
-                            continue;
-                        else
-                            switch (xmlReader.Name.ToLower())
-                            {
-                                case "temp_f":
-                                    xmlReader.Read();
-                                    immediateWeather.temp = decimal.Parse(xmlReader.Value);
-                                    break;
-                                case "wind_mph":
-                                    xmlReader.Read();
-                                    immediateWeather.windSpeed = decimal.Parse(xmlReader.Value);
-                                    break;
-                                case "wind_dir":
-                                    xmlReader.Read();
-                                    immediateWeather.windDir = xmlReader.Value;
-                                    break;
-                                case "condition":
-                                    while (xmlReader.Read() && !(xmlReader.NodeType.Equals(XmlNodeType.EndElement) && xmlReader.Name.Equals("condition")))
-                                        if (xmlReader.Name.Equals("text") && xmlReader.NodeType.Equals(XmlNodeType.Element))
-                                        {
-                                            xmlReader.Read();
-                                            immediateWeather.clouds = xmlReader.Value;
-                                        }
-                                    break;
-                            }
-                if (xmlReader.Name.Equals("location") && xmlReader.NodeType.Equals(XmlNodeType.Element) && !xmlReader.NodeType.Equals(XmlNodeType.EndElement))
-                    while (xmlReader.Read() && !(xmlReader.NodeType.Equals(XmlNodeType.EndElement) && xmlReader.Name.Equals("location")))
-                        if (xmlReader.NodeType.Equals(XmlNodeType.EndElement))
-                            continue;
-                        else
-                            switch (xmlReader.Name.ToLower())
-                            {
-                                case "name":
-                                    xmlReader.Read();
-                                    immediateWeather.city = xmlReader.Value;
-                                    break;
-                                case "region":
-                                    xmlReader.Read();
-                                    immediateWeather.state = xmlReader.Value;
-                                    break;
-                                case "country":
-                                    xmlReader.Read();
-                                    immediateWeather.country = xmlReader.Value;
-                                    break;
-                            }
-            }
+            XPathNavigator nav = new XPathDocument(response.GetResponseStream()).CreateNavigator();   
+            XPathNodeIterator itr;
+            (itr = nav.Select("/root/current/temp_f")).MoveNext();
+            immediateWeather.temp = decimal.Parse(itr.Current.Value);
+            (itr = nav.Select("/root/current/wind_mph")).MoveNext();
+            immediateWeather.windSpeed = decimal.Parse(itr.Current.Value);
+            (itr = nav.Select("/root/current/wind_dir")).MoveNext();
+            immediateWeather.windDir = itr.Current.Value;
+            (itr = nav.Select("/root/current/condition/text")).MoveNext();
+            immediateWeather.clouds = itr.Current.Value;
+            (itr = nav.Select("/root/location/name")).MoveNext();
+            immediateWeather.city = itr.Current.Value;
+            (itr = nav.Select("/root/location/region")).MoveNext();
+            immediateWeather.state = itr.Current.Value;
+            (itr = nav.Select("/root/location/country")).MoveNext();
+            immediateWeather.country = itr.Current.Value;
+
         }
     }
 }
