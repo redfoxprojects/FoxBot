@@ -16,6 +16,7 @@ using IrcDotNet;
 using IrcDotNet.Collections;
 using IrcDotNet.Ctcp;
 using System.Text.RegularExpressions;
+using WeatherServices;
 
 namespace FoxBot
 {
@@ -192,9 +193,6 @@ namespace FoxBot
                 foreach (Match m in reg.Matches(message))
                     switch (m.Value.ToLower())
                     {
-                        case "bitch":
-                            this.client.LocalUser.SendMessage(this.client.Channels[0], "BITCH! :V");
-                            break;
                         case "weather":
                             Match zip = m.NextMatch();
                             if (zip != null)
@@ -221,14 +219,14 @@ namespace FoxBot
             try
             {
                 Weather w = (Weather)o;
-                w.GetWeather();
-                SendMessage(string.Format("{0}°F wind {1} @ {2} MPH with {3} skies in {4}, {5}, {6}", new string[] { w.ImmediateWeather.temp.ToString(),
-                                                                                                                w.ImmediateWeather.windDir.Trim(),
-                                                                                                                w.ImmediateWeather.windSpeed.ToString(),
-                                                                                                                w.ImmediateWeather.clouds.Trim(),
-                                                                                                                w.ImmediateWeather.city.Trim(),
-                                                                                                                w.ImmediateWeather.state.Trim(),
-                                                                                                                w.ImmediateWeather.country.Trim()}));
+                ImmediateWeather weather = w.GetWeather();
+                SendMessage(string.Format("{0}°F wind {1} @ {2} MPH with {3} skies in {4}, {5}, {6}", new string[] { weather.temp.ToString(),
+                                                                                                                weather.windDir.Trim(),
+                                                                                                                weather.windSpeed.ToString(),
+                                                                                                                weather.clouds.Trim(),
+                                                                                                                weather.city.Trim(),
+                                                                                                                weather.state.Trim(),
+                                                                                                                weather.country.Trim()}));
             }
             catch (Exception e)
             {
