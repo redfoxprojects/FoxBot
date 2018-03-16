@@ -8,9 +8,10 @@ using System.Threading;
 using System.Xml;
 using System.Xml.XPath;
 using System.ComponentModel;
+using System.Configuration;
 using System.Windows;
 using System.Net;
-using WeatherServices;
+using FoxBot.ServiceReference1;
 
 namespace FoxBot
 {
@@ -23,22 +24,33 @@ namespace FoxBot
             currentLocation = location;
         }
 
-        public ImmediateWeather GetWeather()
+        public string GetWeather()
         {
-            WeatherService srv = new WeatherService();
+            Service1Client srv = new Service1Client();
             if (currentLocation.Length.Equals(5))
             {
                 int blah;
                 int.TryParse(currentLocation, out blah);
 
-                return srv.GetWeather(srv.GetStream(blah.ToString()));
+                return Format(srv.GetData(blah.ToString()));
             }
             else if (currentLocation.Length.Equals(3))
             {
-                return srv.GetWeather(srv.GetStream(currentLocation));
+                return Format(srv.GetData(currentLocation));
             }
             else
                 throw new Exception("zip not long enough");
+        }
+
+        private string Format(ImmediateWeather weather)
+        {
+            return string.Format("{0}°F wind {1} @ {2} MPH with {3} skies in {4}, {5}, {6}", new string[] { weather.temp.ToString(),
+                                                                                                                weather.windDir.Trim(),
+                                                                                                                weather.windSpeed.ToString(),
+                                                                                                                weather.clouds.Trim(),
+                                                                                                                weather.city.Trim(),
+                                                                                                                weather.state.Trim(),
+                                                                                                                weather.country.Trim()});
         }
     }
 }

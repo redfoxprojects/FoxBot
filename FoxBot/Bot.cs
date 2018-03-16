@@ -16,7 +16,6 @@ using IrcDotNet;
 using IrcDotNet.Collections;
 using IrcDotNet.Ctcp;
 using System.Text.RegularExpressions;
-using WeatherServices;
 
 namespace FoxBot
 {
@@ -206,8 +205,11 @@ namespace FoxBot
                             t.Start(w);
                             break;
                         case "leave":
-                            if (ircMessage.Source.Name.ToLower().Equals("alex"))
-                                client.Quit("D:");
+                            if (ircMessage.Source.Name.ToLower().Equals("syrfox"))
+                            {
+                                SendMessage(":<");
+                                client.Quit();
+                            }
                             break;
                     }
                 return;
@@ -219,14 +221,7 @@ namespace FoxBot
             try
             {
                 Weather w = (Weather)o;
-                ImmediateWeather weather = w.GetWeather();
-                SendMessage(string.Format("{0}°F wind {1} @ {2} MPH with {3} skies in {4}, {5}, {6}", new string[] { weather.temp.ToString(),
-                                                                                                                weather.windDir.Trim(),
-                                                                                                                weather.windSpeed.ToString(),
-                                                                                                                weather.clouds.Trim(),
-                                                                                                                weather.city.Trim(),
-                                                                                                                weather.state.Trim(),
-                                                                                                                weather.country.Trim()}));
+                SendMessage(w.GetWeather());
             }
             catch (Exception e)
             {

@@ -4,12 +4,18 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 15.0.26730.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxBot", "FoxBot\FoxBot.csproj", "{1C617647-CB18-4D2A-83FE-1E119240E9E0}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8E49E65F-0643-4E35-BFEA-A541BA7ACC17} = {8E49E65F-0643-4E35-BFEA-A541BA7ACC17}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApplication1", "ConsoleApplication1\ConsoleApplication1.csproj", "{D3051BB4-6499-407A-93F2-DF1CF866BBAB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8E49E65F-0643-4E35-BFEA-A541BA7ACC17} = {8E49E65F-0643-4E35-BFEA-A541BA7ACC17}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxBoxService", "FoxBoxService\FoxBoxService.csproj", "{D32F2E7E-61CD-4AE9-B8D8-9A9F087ABC72}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeatherServices", "..\WeatherUtilities\WeatherServices\WeatherServices.csproj", "{EFB2E9AF-9C36-489A-B202-ACE7EE892FF4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeatherService", "..\WeatherUtilities\WeatherService\WeatherService.csproj", "{8E49E65F-0643-4E35-BFEA-A541BA7ACC17}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,10 +35,10 @@ Global
 		{D32F2E7E-61CD-4AE9-B8D8-9A9F087ABC72}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D32F2E7E-61CD-4AE9-B8D8-9A9F087ABC72}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D32F2E7E-61CD-4AE9-B8D8-9A9F087ABC72}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EFB2E9AF-9C36-489A-B202-ACE7EE892FF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EFB2E9AF-9C36-489A-B202-ACE7EE892FF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EFB2E9AF-9C36-489A-B202-ACE7EE892FF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EFB2E9AF-9C36-489A-B202-ACE7EE892FF4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E49E65F-0643-4E35-BFEA-A541BA7ACC17}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E49E65F-0643-4E35-BFEA-A541BA7ACC17}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E49E65F-0643-4E35-BFEA-A541BA7ACC17}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E49E65F-0643-4E35-BFEA-A541BA7ACC17}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
